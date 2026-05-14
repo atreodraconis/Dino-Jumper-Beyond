@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dino Jumper — Enhanced Edition</title>
+
+<!-- Retro Pixel Font -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+/* GLOBAL */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Press Start 2P", monospace;
+}
+
+body {
+  background: #f2f2f2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+/* TITLE */
+h1 {
+  font-size: 22px;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 0 #ccc;
+}
+
+/* GAME CONTAINER */
+#game {
+  position: relative;
+  width: 900px;
+  height: 260px;
+  border: 3px solid #000;
+  background: #fff;
+  overflow: hidden;
+  image-rendering: pixelated;
+}
+
+/* SKY PARALLAX */
+#game::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    to bottom,
+    #ffffff,
+    #ffffff 180px,
+    #eaeaea 180px,
+    #eaeaea 200px
+  );
+  animation: skyMove 12s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes skyMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* GROUND */
+#ground {
+  position: absolute;
+  bottom: 0;
+  width: 200%;
+  height: 40px;
+  background: repeating-linear-gradient(
+    to right,
+    #000 0px,
+    #000 4px,
+    transparent 4px,
+    transparent 12px
+  );
+  animation: groundMove 1s linear infinite;
+}
+
+@keyframes groundMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* DINO */
+#dino {
+  position: absolute;
+  bottom: 40px;
+  left: 80px;
+  width: 44px;
+  height: 48px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: drop-shadow(2px 2px 0 #000);
+}
+
+/* SKINS */
+.skin-default { background-image: url('https://i.imgur.com/8QfQ2Qy.png'); }
+.skin-red     { background-image: url('https://i.imgur.com/8QfQ2Qy.png'); filter: hue-rotate(330deg) brightness(1.2); }
+.skin-blue    { background-image: url('https://i.imgur.com/8QfQ2Qy.png'); filter: hue-rotate(200deg) brightness(1.2); }
+.skin-gold    { background-image: url('https://i.imgur.com/8QfQ2Qy.png'); filter: hue-rotate(60deg) brightness(1.5); }
+
+/* OBSTACLE */
+#cactus {
+  position: absolute;
+  bottom: 40px;
+  right: -40px;
+  width: 30px;
+  height: 50px;
+  background-image: url('https://i.imgur.com/1XQwZQF.png');
+  background-size: cover;
+  filter: drop-shadow(2px 2px 0 #000);
+}
+
+/* UI */
+#ui {
+  width: 900px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+button, select {
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 2px solid #000;
+  background: #fff;
+}
+
+button:hover, select:hover {
+  background: #eaeaea;
+}
+
+#message {
+  margin-top: 10px;
+  height: 20px;
+  color: #444;
+  font-size: 12px;
+}
+
+/* SHOP */
+#shop {
+  width: 900px;
+  margin-top: 20px;
+  padding: 10px;
+  border: 2px solid #000;
+  background: #fff;
+}
+
+.shop-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.skin-preview {
+  width: 30px;
+  height: 30px;
+  background-size: cover;
+  border: 2px solid #000;
+}
+
+.locked {
+  opacity: 0.4;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Dino Jumper — Enhanced Edition</h1>
+
+<div id="ui">
+  <div>
+    <span id="score">Score: 0</span> |
+    <span id="best">Best: 0</span> |
+    <span id="levelText">Level: 1</span>
+  </div>
+
+  <div>
+    Skin:
+    <select id="skinSelect"></select>
+
+    Level:
+    <select id="levelSelect"></select>
+
+    <button id="start">Start</button>
+    <button id="reset">Reset</button>
+  </div>
+</div>
+
+<div id="game">
+  <div id="dino" class="skin-default"></div>
+  <div id="cactus"></div>
+  <div id="ground"></div>
+</div>
+
+<div id="message"></div>
+
+<div id="shop">
+  <h3>Unlocks</h3>
+
+  <div class="shop-row">
+    <div class="skin-preview skin-default"></div>
+    Default Dino (Unlocked)
+  </div>
+
+  <div class="shop-row">
+    <div class="skin-preview skin-red"></div>
+    Red Dino — Unlock at score 50
+  </div>
+
+  <div class="shop-row">
+    <div class="skin-preview skin-blue"></div>
+    Blue Dino — Unlock at score 150
+  </div>
+
+  <div class="shop-row">
+    <div class="skin-preview skin-gold"></div>
+    Golden Dino — Unlock at score 300
+  </div>
+
+  <p style="font-size:10px;margin-top:10px;">
+    Levels unlock at: L2 = 80, L3 = 160, L4 = 260
+  </p>
+</div>
+
+<script>
+/* GAME VARIABLES */
+let dino = document.getElementById("dino");
+let cactus = document.getElementById("cactus");
+let scoreEl = document.getElementById("score");
+let bestEl = document.getElementById("best");
+let levelText = document.getElementById("levelText");
+let message = document.getElementById("message");
+
+let skinSelect = document.getElementById("skinSelect");
+let levelSelect = document.getElementById("levelSelect");
+
+let score = 0;
+let best = 0;
+let level = 1;
+let speed = 6;
+
+let jumping = false;
+let velocity = 0;
+let gravity = -0.6;
+let jumpPower = 11;
+let y = 0;
+
+let cactusX = 900;
+let running = false;
+
+/* SKINS + LEVELS */
+const SKINS = [
+  { id: "default", name: "Default", className: "skin-default", unlock: 0 },
+  { id: "red", name: "Red", className: "skin-red", unlock: 50 },
+  { id: "blue", name: "Blue", className: "skin-blue", unlock: 150 },
+  { id: "gold", name: "Gold", className: "skin-gold", unlock: 300 }
+];
+
+const LEVELS = [
+  { id: 1, name: "Level 1", speed: 6, unlock: 0 },
+  { id: 2, name: "Level 2", speed: 8, unlock: 80 },
+  { id: 3, name: "Level 3", speed: 10, unlock: 160 },
+  { id: 4, name: "Level 4", speed: 12, unlock: 260 }
+];
+
+let unlockedSkins = new Set(["default"]);
+let unlockedLevels = new Set([1]);
+
+/* POPULATE SELECT MENUS */
+function refreshMenus() {
+  skinSelect.innerHTML = "";
+  SKINS.forEach(s => {
+    let opt = document.createElement("option");
+    opt.value = s.id;
+    opt.textContent = s.name;
+    if (!unlockedSkins.has(s.id)) opt.disabled = true;
+    skinSelect.appendChild(opt);
+  });
+
+  levelSelect.innerHTML = "";
+  LEVELS.forEach(l => {
+    let opt = document.createElement("option");
+    opt.value = l.id;
+    opt.textContent = l.name;
+    if (!unlockedLevels.has(l.id)) opt.disabled = true;
+    levelSelect.appendChild(opt);
+  });
+}
+
+refreshMenus();
+
+/* APPLY SKIN */
+skinSelect.onchange = () => {
+  let chosen = skinSelect.value;
+  if (!unlockedSkins.has(chosen)) return;
+  let skin = SKINS.find(s => s.id === chosen);
+  dino.className = skin.className;
+};
+
+/* APPLY LEVEL */
+levelSelect.onchange = () => {
+  let chosen = Number(levelSelect.value);
+  if (!unlockedLevels.has(chosen)) return;
+  let lvl = LEVELS.find(l => l.id === chosen);
+  speed = lvl.speed;
+  level = lvl.id;
+  levelText.textContent = "Level: " + level;
+};
+
+/* JUMP */
+document.addEventListener("keydown", e => {
+  if (e.code === "Space" || e.code === "ArrowUp") {
+    if (!jumping) {
+      jumping = true;
+      velocity = jumpPower;
+    }
+  }
+});
+
+/* START GAME */
+document.getElementById("start").onclick = () => {
+  if (running) return;
+  running = true;
+  score = 0;
+  cactusX = 900;
+  gameLoop();
+};
+
+/* RESET */
+document.getElementById("reset").onclick = () => {
+  best = 0;
+  unlockedSkins = new Set(["default"]);
+  unlockedLevels = new Set([1]);
+  refreshMenus();
+  message.textContent = "Progress reset";
+};
+
+/* GAME LOOP */
+function gameLoop() {
+  if (!running) return;
+
+  /* Jump physics */
+  if (jumping) {
+    y += velocity;
+    velocity += gravity;
+    if (y <= 0) {
+      y = 0;
+      jumping = false;
+    }
+  }
+  dino.style.bottom = (40 + y) + "px";
+
+  /* Move cactus */
+  cactusX -= speed;
+  if (cactusX < -40) {
+    cactusX = 900 + Math.random() * 200;
+    score++;
+    scoreEl.textContent = "Score: " + score;
+    checkUnlocks();
+  }
+  cactus.style.right = (900 - cactusX - 30) + "px";
+
+  /* Collision */
+  let d = dino.getBoundingClientRect();
+  let c = cactus.getBoundingClientRect();
+
+  if (
+    d.left < c.right &&
+    d.right > c.left &&
+    d.bottom > c.top &&
+    d.top < c.bottom
+  ) {
+    running = false;
+    message.textContent = "Game Over!";
+    if (score > best) {
+      best = score;
+      bestEl.textContent = "Best: " + best;
+      message.textContent = "New High Score!";
+    }
+    return;
+  }
+
+  requestAnimationFrame(gameLoop);
+}
+
+/* UNLOCK SYSTEM */
+function checkUnlocks() {
+  SKINS.forEach(s => {
+    if (score >= s.unlock) unlockedSkins.add(s.id);
+  });
+
+  LEVELS.forEach(l => {
+    if (score >= l.unlock) unlockedLevels.add(l.id);
+  });
+
+  refreshMenus();
+}
+</script>
+
+</body>
+</html>
